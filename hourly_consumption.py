@@ -4,13 +4,17 @@ import datetime as dt
 
 
 def read_data(fname):
+    """
+    fname: string with path to csv downloaded from TEP website
+    returns lists
+    """
     date = []
     t_start = []
     t_end = []
     consumption = []  # in KWh
     with open(fname, 'r') as f:
         for i, line in enumerate(f):
-            if i <= 2: continue
+            if i <= 2: continue  # skip header
             line = line.split(',')
             date.append(line[-6])
             t_start.append(line[-5])
@@ -40,7 +44,9 @@ def avg_production(annual_production=14800):  # Kwh/yr
 
 
 if __name__ == "__main__":
-    date, t_start, t_end, consumption = read_data('./HourlyIntervalData-20240621_20241111.csv')
+    # put in this folder the csv file name and change the string below
+    fname = './HourlyIntervalData-20240621_20241111.csv'
+    date, t_start, t_end, consumption = read_data(fname)
     fixed_dates = convert_dates(date, t_start)
     fig, ax = plt.subplots()
     ax.plot(fixed_dates, np.array(consumption, dtype=float), lw=1)
