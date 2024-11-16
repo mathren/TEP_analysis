@@ -1,0 +1,4 @@
+* Tucson Electric Power data analysis
+
+Quick-and-dirty python script to plot the hourly consumption that can
+be downloaded from the TEP website in csv format.
