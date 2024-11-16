@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+import matplotlib.ticker as ticker
 import datetime as dt
 
 
@@ -43,13 +45,22 @@ def avg_production(annual_production=14800):  # Kwh/yr
     return hourly_production  # KWh
 
 
+def sunday_formatter(x, pos):
+    """Custom formatter to display labels only for Sundays."""
+    date = mdates.num2date(x)
+    return date.strftime('%d %b') if date.weekday() == 6 else ""
+
+
 if __name__ == "__main__":
     # put in this folder the csv file name and change the string below
     fname = './HourlyIntervalData-20240621_20241111.csv'
     date, t_start, t_end, consumption = read_data(fname)
     fixed_dates = convert_dates(date, t_start)
     fig, ax = plt.subplots()
-    ax.plot(fixed_dates, np.array(consumption, dtype=float), lw=1)
+    bx = ax.twinx()
+    consumption = np.array(consumption, dtype=float)
+    ax.plot(fixed_dates, consumption, lw=1)
+    bx.plot(fixed_dates, np.cumsum(consumption), lw=3, c='C1')
     ax.scatter(fixed_dates, np.array(consumption, dtype=float))
     # add markers
     ax.axhline(avg_production(), c='r', lw=3, zorder=0)
@@ -57,5 +68,13 @@ if __name__ == "__main__":
     ax.axvline(convert_one_date_time("08/10/2024", "1:00 AM"), 0, 1, ls='--', c='purple')
     ax.set_ylabel(r'Hourly Consumption [KWh]')
     ax.set_xlabel(r'Date')
-    plt.show()
-    # plt.savefig("consumption.pdf")
+    bx.set_ylabel(r'Cumulative consumption [Kwh]', color='C1')
+    ax.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=6))  # Major ticks on Sundays
+    ax.xaxis.set_minor_locator(mdates.DayLocator())  # Minor ticks every day
+    ax.xaxis.set_major_formatter(ticker.FuncFormatter(sunday_formatter))
+    # Rotate and align the labels for better readability
+    plt.setp(ax.xaxis.get_majorticklabels(), rotation=45, ha="right")
+    bx.tick_params(colors="C1", )
+    bx.spines['right'].set_color("C1")
+    # plt.show()
+    plt.savefig("consumption.pdf")
