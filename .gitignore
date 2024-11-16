@@ -1,0 +1,5 @@
+*
+!*.yml
+!*.py
+!matplotlibrc
+!.gitignore
