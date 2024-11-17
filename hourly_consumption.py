@@ -56,14 +56,15 @@ if __name__ == "__main__":
     fname = './HourlyIntervalData-20240621_20241111.csv'
     date, t_start, t_end, consumption = read_data(fname)
     fixed_dates = convert_dates(date, t_start)
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(16, 9))
     bx = ax.twinx()
     consumption = np.array(consumption, dtype=float)
     ax.plot(fixed_dates, consumption, lw=1)
-    bx.plot(fixed_dates, np.cumsum(consumption), lw=3, c='C1')
+    bx.plot(fixed_dates, np.cumsum(consumption), lw=3, c='C1', zorder=1)
     ax.scatter(fixed_dates, np.array(consumption, dtype=float))
     # add markers
-    ax.axhline(avg_production(), c='r', lw=3, zorder=0)
+    # ax.axhline(avg_production(), c='r', lw=3, zorder=0, label)
+    ax.axhline(8.17, c='r', ls="-.", zorder=0, label=r"Net Zero Solar Production")
     ax.axvline(convert_one_date_time("07/21/2024", "1:00 AM"), 0, 1, ls='--', c='blue')
     ax.axvline(convert_one_date_time("08/10/2024", "1:00 AM"), 0, 1, ls='--', c='purple')
     ax.set_ylabel(r'Hourly Consumption [KWh]')
@@ -74,7 +75,10 @@ if __name__ == "__main__":
     ax.xaxis.set_major_formatter(ticker.FuncFormatter(sunday_formatter))
     # Rotate and align the labels for better readability
     plt.setp(ax.xaxis.get_majorticklabels(), rotation=45, ha="right")
-    bx.tick_params(colors="C1", )
+    bx.tick_params(colors="C1", which="both")
     bx.spines['right'].set_color("C1")
-    # plt.show()
+    # ax.legend()
+    ax.text(0.05, 0.9, r"Prop. 2 production", size=20,
+            color='red', transform=ax.transAxes, ha='left', va='center')
     plt.savefig("consumption.pdf")
+    plt.show()
